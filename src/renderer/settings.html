@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none';" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사이드메모장 설정</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="settings-body">
+  <main class="settings-shell">
+    <h1>설정</h1>
+    <section class="settings-card">
+      <div class="settings-content">
+        <section class="setting-section">
+          <h2>일반</h2>
+          <label><span>항상 위에 표시</span><input id="alwaysOnTop" type="checkbox" /></label>
+          <label><span>다른 곳 클릭 시 접기</span><input id="collapseOnBlur" type="checkbox" /></label>
+          <label><span>접혔을 때 납작한 탭 사용</span><input id="collapsedFlatMode" type="checkbox" /></label>
+          <label><span>오타 확인 표시</span><input id="spellcheck" type="checkbox" /></label>
+          <label><span>Windows 시작 시 자동 실행</span><input id="launchAtStartup" type="checkbox" /></label>
+        </section>
+        <section class="setting-section">
+          <h2>화면</h2>
+          <label><span>위치</span>
+            <select id="position">
+              <option value="right">오른쪽</option>
+              <option value="left">왼쪽</option>
+            </select>
+          </label>
+          <label><span>패널 너비</span><input id="width" type="number" min="360" step="10" /></label>
+          <label><span>패널 높이</span><input id="height" type="number" min="420" step="10" /></label>
+          <p class="settings-hint">패널 안쪽 오른쪽 아래 모서리를 잡고 드래그해도 크기가 바로 바뀝니다.</p>
+        </section>
+        <section class="setting-section">
+          <h2>백업</h2>
+          <div class="row-actions">
+            <button id="importData">가져오기</button>
+            <button id="exportData">내보내기</button>
+            <button id="resetData" class="danger">초기화</button>
+          </div>
+        </section>
+        <section class="setting-section about-card">
+          <h2>정보</h2>
+          <div class="about-head-row">
+            <p><strong id="appVersionLabel">사이드메모장</strong></p>
+            <button id="checkUpdates" class="secondary-button compact-update-button" type="button">업데이트 확인</button>
+          </div>
+          <p>Developed by <strong>Seokryu</strong></p>
+          <p>Contact: <a href="#" id="contactEmail">kjseokryu@gmail.com</a></p>
+          <div id="updateStatusText" class="update-status-text compact-update-status update-status-box" data-status="neutral">앱 실행 후 자동으로 업데이트 상태를 확인합니다.</div>
+        </section>
+        
+        <div class="settings-divider"></div>
+        <section class="setting-section inline-section" id="colorSaturationSection">
+          <h2>색상</h2>
+          <label class="setting-row vertical">
+            <div class="setting-row-head">
+              <span>전체 색상 채도</span>
+              <strong id="colorSaturationValue">100%</strong>
+            </div>
+            <input id="colorSaturationSlider" type="range" min="0" max="200" value="100" />
+            <small>메모 탭, 색상 팔레트, 접힌 탭 색감에 적용됩니다.</small>
+          </label>
+          <label class="setting-row vertical">
+            <div class="setting-row-head">
+              <span>접혔을 때 가로 길이</span>
+              <strong id="collapsedLengthValue">100%</strong>
+            </div>
+            <input id="collapsedLengthSlider" type="range" min="20" max="200" value="100" />
+            <small>접힌 탭의 옆 방향 길이를 조절합니다.</small>
+          </label>
+        </section>
+
+      </div>
+    </section>
+</main>
+  <script src="settings.js"></script>
+</body>
+</html>

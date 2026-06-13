@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none';" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사이드메모장</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="panel-body">
+  <div id="app" class="panel collapsed">
+    <div id="collapsedStack" class="collapsed-stack" title="사이드메모장"></div>
+
+    <section id="panelContent" class="panel-content">
+      <header class="explorer-titlebar">
+        <div class="path-pill">
+          <span class="app-icon">▣</span>
+          <strong id="headerTitle">사이드메모장</strong>
+          <button id="dockSideButton" class="dock-side-button" type="button" title="좌/우 붙이기 전환">⇄</button>
+          <div class="display-arrows" title="다른 모니터로 이동">
+            <button id="moveDisplayLeft" type="button" title="왼쪽 모니터로 이동">‹</button>
+            <button id="moveDisplayRight" type="button" title="오른쪽 모니터로 이동">›</button>
+          </div>
+        </div>
+        <div class="window-actions">
+          <button id="listButtonTop" title="목록">☰</button>
+          <button id="settingsButton" title="설정">⚙</button>
+          <button id="hidePanelButton" title="화면에서 숨기기">—</button>
+          <button id="closeButton" title="접기">×</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <nav class="memo-tabs-wrap">
+          <div id="memoTabs" class="memo-tabs"></div>
+          <button id="addMemoButton" class="add-inline" title="메모 추가">＋</button>
+        </nav>
+
+        <div id="findBar" class="find-bar" hidden>
+          <input id="findInput" type="text" placeholder="찾기..." maxlength="100" autocomplete="off" spellcheck="false" />
+          <span id="findCount" class="find-count"></span>
+          <button id="findPrevButton" title="이전 (Shift+Enter)">‹</button>
+          <button id="findNextButton" title="다음 (Enter)">›</button>
+          <button id="findCloseButton" title="닫기">×</button>
+        </div>
+
+        <div id="memoEditor" class="memo-editor" contenteditable="true" spellcheck="false" data-placeholder="메모를 입력하세요..."></div>
+
+        <footer class="editor-footer">
+          <div class="format-actions">
+            <select id="fontSizeSelect" class="font-size-select" title="글자 크기">
+              <option value="">pt</option>
+              <option value="8">8pt</option>
+              <option value="10">10pt</option>
+              <option value="12">12pt</option>
+              <option value="14">14pt</option>
+              <option value="16">16pt</option>
+              <option value="18">18pt</option>
+              <option value="20">20pt</option>
+              <option value="24">24pt</option>
+            </select>
+            <span class="format-divider"></span>
+            <button id="boldButton" title="굵게 (Ctrl+B)"><strong>B</strong></button>
+            <button id="italicButton" title="기울임 (Ctrl+I)"><em>I</em></button>
+            <button id="underlineButton" title="밑줄 (Ctrl+U)"><u>U</u></button>
+            <button id="strikeButton" title="취소선 (Ctrl+Shift+X)"><s>S</s></button>
+            <button id="textColorButton" title="글자색">A▼</button>
+            <span class="format-divider"></span>
+            <button id="alignLeftButton" title="왼쪽 정렬" style="font-size:11px;font-weight:900;">좌</button>
+            <button id="alignCenterButton" title="가운데 정렬" style="font-size:11px;font-weight:900;">중</button>
+            <button id="alignRightButton" title="오른쪽 정렬" style="font-size:11px;font-weight:900;">우</button>
+            <span class="format-divider"></span>
+            <button id="listButton" title="점 목록">≡</button>
+            <button id="checklistButton" title="체크리스트">☐</button>
+          </div>
+          <span id="charCount" class="char-count"></span>
+          <button id="toggleAppearanceButton" class="appearance-toggle" title="색상">색상</button>
+        </footer>
+
+        <section id="textAppearanceCard" class="appearance-card collapsed-appearance" hidden>
+          <div class="color-section">
+            <span>글씨 색상</span>
+            <div id="textColorInlinePalette" class="text-inline-palette">
+
+          <button data-color="#111827" style="--swatch:#111827">검정</button>
+          <button data-color="#6b7280" style="--swatch:#6b7280">회색</button>
+          <button data-color="#ef4444" style="--swatch:#ef4444">빨강</button>
+          <button data-color="#f97316" style="--swatch:#f97316">주황</button>
+          <button data-color="#eab308" style="--swatch:#eab308">노랑</button>
+          <button data-color="#22c55e" style="--swatch:#22c55e">초록</button>
+          <button data-color="#14b8a6" style="--swatch:#14b8a6">민트</button>
+          <button data-color="#06b6d4" style="--swatch:#06b6d4">하늘</button>
+          <button data-color="#3b82f6" style="--swatch:#3b82f6">파랑</button>
+          <button data-color="#8b5cf6" style="--swatch:#8b5cf6">보라</button>
+          <button data-color="#ec4899" style="--swatch:#ec4899">분홍</button>
+          <button data-color="#ffffff" style="--swatch:#ffffff">흰색</button>
+
+            </div>
+          </div>
+        </section>
+
+        <section id="appearanceCard" class="appearance-card collapsed-appearance">
+          <div class="color-section">
+            <span>색상</span>
+            <div id="colorPalette" class="color-palette"></div>
+            <div class="saturation-control">
+              <div class="saturation-label">
+                <span>채도</span>
+                <strong id="saturationValue">72%</strong>
+              </div>
+              <input id="saturationSlider" type="range" min="0" max="200" value="100" />
+            </div>
+            <select id="memoColor" class="sr-only" aria-label="색상">
+              <option value="purple">보라</option>
+              <option value="pink">분홍</option>
+              <option value="rose">장미</option>
+              <option value="peach">피치</option>
+              <option value="yellow">노랑</option>
+              <option value="lime">라임</option>
+              <option value="mint">민트</option>
+              <option value="cyan">민트블루</option>
+              <option value="blue">파랑</option>
+              <option value="lavender">라벤더</option>
+              <option value="gray">회색</option>
+              <option value="dark">다크</option>
+            </select>
+          </div>
+        </section>
+      </main>
+
+
+      <div id="listModal" class="list-modal" hidden>
+        <div class="list-card">
+          <header class="list-header">
+            <div>
+              <strong>메모 목록</strong>
+              <small>여러 개를 선택해서 정리할 수 있어요.</small>
+            </div>
+            <button id="closeListButton" class="list-close" title="닫기">×</button>
+          </header>
+          <div id="memoListItems" class="memo-list-items"></div>
+          <footer class="list-footer">
+            <button id="selectAllMemosButton" class="list-secondary">전체 선택</button>
+            <button id="deleteSelectedMemosButton" class="list-danger">선택 삭제</button>
+          </footer>
+        </div>
+      </div>
+
+      <button id="resizeHandle" class="resize-handle" type="button" title="크기 조절" aria-label="크기 조절"></button>
+    </section>
+
+    <div id="memoMenu" class="memo-menu" hidden>
+      <div id="menuActions" class="menu-actions">
+        <button id="renameMemoButton">이름 변경</button>
+        <button id="copyMemoButton">복사본 만들기</button>
+        <button id="exportMemoButton">내보내기</button>
+        <button id="deleteFromMenuButton" class="menu-danger">삭제</button>
+      </div>
+      <div id="renameInline" class="rename-inline" hidden>
+        <input id="renameInput" type="text" maxlength="24" placeholder="메모 이름" />
+        <div class="rename-actions">
+          <button id="cancelRenameButton">취소</button>
+          <button id="saveRenameButton">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" hidden>
+      <span class="toast-icon">🗑</span>
+      <div class="toast-message">
+        <strong id="toastText">메모가 삭제되었습니다.</strong>
+        <small>5초 후 자동으로 사라집니다.</small>
+      </div>
+      <button id="undoDeleteButton">실행 취소</button>
+      <button id="closeToastButton" class="toast-close">×</button>
+    </div>
+  </div>
+  <script src="panel.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "name": "side-memojang",
+  "productName": "사이드메모장",
+  "version": "1.0.7",
+  "description": "화면 가장자리에 붙는 Seokryu의 개인용 플로팅 메모장",
+  "main": "src/main/main.js",
+  "author": {
+    "name": "Seokryu",
+    "email": "kjseokryu@gmail.com"
+  },
+  "license": "UNLICENSED",
+  "private": false,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --publish never",
+    "dist:portable": "electron-builder --win portable",
+    "pack": "electron-builder --dir",
+    "dist:setup": "electron-builder --win nsis --publish never"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.local.sidememojang",
+    "productName": "사이드메모장",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "assets/**/*",
+      "!**/*.map",
+      "!**/*.txt",
+      "!**/README*",
+      "!**/CHANGELOG*"
+    ],
+    "asar": true,
+    "compression": "maximum",
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.ico",
+      "publisherName": "Seokryu"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "사이드메모장",
+      "artifactName": "side-memojang-setup-${version}.${ext}"
+    },
+    "artifactName": "side-memojang-${version}.${ext}",
+    "copyright": "Copyright © 2026 Seokryu",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "kimjae134679",
+        "repo": "SideMemojang_01"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  }
+}
