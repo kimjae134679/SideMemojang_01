@@ -1,0 +1,87 @@
+--- /mnt/data/prevsrc/src/renderer/panel.js	2026-08-26 15:17:38.000000000 +0000
++++ /mnt/data/sidememo_work/src/renderer/panel.js	2026-08-26 15:56:35.301612479 +0000
+@@ -1759,14 +1759,52 @@
+   updateMemoContent();
+   saveEditorSelection();
+ }
++function isKeyX(event) {
++  return event.code === 'KeyX' || String(event.key || '').toLowerCase() === 'x';
++}
++
++function toggleStrikeExplicit() {
++  // Use the live range first so Ctrl+Shift+X works even when the selection
++  // reaches the very first character. savedEditorRange can otherwise lag one event.
++  saveEditorSelection();
++  restoreEditorSelection();
++  memoEditor.focus();
++
++  let applied = false;
++  try {
++    document.execCommand('styleWithCSS', false, false);
++    applied = document.execCommand('strikeThrough', false, null) !== false;
++  } catch (_) {}
++
++  // Chromium normally supports strikeThrough, but keep a fallback for a
++  // non-empty range in case execCommand refuses the command.
++  if (!applied && hasNonEmptyEditorSelection()) {
++    wrapSelectionWithTag('s');
++  }
++
++  markEditorTyping();
++  updateMemoContent();
++  saveEditorSelection();
++  updateFormatStates();
++}
++
+ function handleEditorShortcut(event) {
+-  const key = event.key.toLowerCase();
++  const key = String(event.key || '').toLowerCase();
+   const mod = event.ctrlKey || event.metaKey;
+   if (!mod) return false;
+-  if (key === 'b') { event.preventDefault(); event.stopPropagation(); toggleBoldExplicit(); return true; }
+-  if (key === 'i') { event.preventDefault(); event.stopPropagation(); runFormat('italic'); return true; }
+-  if (key === 'u') { event.preventDefault(); event.stopPropagation(); runFormat('underline'); return true; }
+-  if (event.shiftKey && key === 'x') { event.preventDefault(); runFormat('strikeThrough'); return true; }
++
++  // Check the physical X key too. This is more reliable with Korean IME and
++  // shifted keyboard input than depending on event.key alone.
++  if (event.shiftKey && isKeyX(event)) {
++    event.preventDefault();
++    event.stopPropagation();
++    toggleStrikeExplicit();
++    return true;
++  }
++
++  if (key === 'b') { event.preventDefault(); event.stopPropagation(); saveEditorSelection(); toggleBoldExplicit(); return true; }
++  if (key === 'i') { event.preventDefault(); event.stopPropagation(); saveEditorSelection(); runFormat('italic'); return true; }
++  if (key === 'u') { event.preventDefault(); event.stopPropagation(); saveEditorSelection(); runFormat('underline'); return true; }
+   return false;
+ }
+ 
+@@ -1973,7 +2011,7 @@
+   boldButton.addEventListener('click', () => toggleBoldExplicit());
+   italicButton.addEventListener('click', () => runFormat('italic'));
+   underlineButton.addEventListener('click', () => runFormat('underline'));
+-  strikeButton?.addEventListener('click', () => runFormat('strikeThrough'));
++  strikeButton?.addEventListener('click', () => toggleStrikeExplicit());
+   textColorButton?.addEventListener('mousedown', (event) => {
+     event.preventDefault();
+     event.stopPropagation();
+@@ -2046,7 +2084,7 @@
+     const key = event.key.toLowerCase();
+     const mod = event.ctrlKey || event.metaKey;
+     if (selectedImageWrap && mod && key === 'c') { event.preventDefault(); copySelectedImage(); return; }
+-    if (selectedImageWrap && mod && key === 'x') {
++    if (selectedImageWrap && mod && key === 'x' && !event.shiftKey) {
+       event.preventDefault();
+       const target = selectedImageWrap;
+       captureImmediateEditorHistory();
+@@ -2140,7 +2178,7 @@
+     if (mod && key === 'b') { event.preventDefault(); runFormat('bold'); }
+     if (mod && key === 'i') { event.preventDefault(); runFormat('italic'); }
+     if (mod && key === 'u') { event.preventDefault(); runFormat('underline'); }
+-    if (mod && event.shiftKey && key === 'x') { event.preventDefault(); runFormat('strikeThrough'); }
++    if (mod && event.shiftKey && isKeyX(event)) { event.preventDefault(); event.stopPropagation(); toggleStrikeExplicit(); }
+     if (mod && event.shiftKey && key === 'i') { event.preventDefault(); pickAndInsertMedia(); }
+   });
+   if (fontSizeSelect) {
