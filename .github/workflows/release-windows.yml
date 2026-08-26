@@ -37,11 +37,14 @@ jobs:
       - name: Restore finalized source
         shell: pwsh
         run: |
-          $bundle = "release-bundles/v$env:RELEASE_VERSION-source.zip"
-          if (!(Test-Path $bundle)) { throw "Final source bundle not found: $bundle" }
+          $bundleText = "release-bundles/v$env:RELEASE_VERSION-source.tar.xz.b64"
+          if (!(Test-Path $bundleText)) { throw "Final source bundle not found: $bundleText" }
+          $archive = Join-Path $env:RUNNER_TEMP "sidememojang-source.tar.xz"
+          [IO.File]::WriteAllBytes($archive, [Convert]::FromBase64String((Get-Content $bundleText -Raw).Trim()))
           $temp = Join-Path $env:RUNNER_TEMP "sidememojang-source"
           if (Test-Path $temp) { Remove-Item $temp -Recurse -Force }
-          Expand-Archive -Path $bundle -DestinationPath $temp -Force
+          New-Item -ItemType Directory -Path $temp | Out-Null
+          tar -xJf $archive -C $temp
           Get-ChildItem $temp -Force | ForEach-Object {
             Copy-Item $_.FullName -Destination $PWD -Recurse -Force
           }
