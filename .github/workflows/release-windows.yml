@@ -9,7 +9,9 @@ on:
         default: 1.1.2
   push:
     branches:
-      - release/**
+      - main
+    paths:
+      - 'release-trigger-*.txt'
 
 permissions:
   contents: write
@@ -18,7 +20,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - name: Checkout release branch
+      - name: Checkout release source
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -29,7 +31,8 @@ jobs:
           if ("${{ github.event_name }}" -eq "workflow_dispatch") {
             $version = "${{ inputs.version }}"
           } else {
-            $version = "${{ github.ref_name }}".Replace("release/", "")
+            $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+            $version = $pkg.version
           }
           if (-not $version) { throw "Release version is empty." }
           "RELEASE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
@@ -78,6 +81,7 @@ jobs:
         run: |
           if (Test-Path release-bundles) { Remove-Item release-bundles -Recurse -Force }
           if (Test-Path dev-patches) { Remove-Item dev-patches -Recurse -Force }
+          Get-ChildItem release-trigger-*.txt -ErrorAction SilentlyContinue | Remove-Item -Force
           git config user.name "SideMemojang Release Bot"
           git config user.email "actions@github.com"
           git add -A
