@@ -1,7 +1,7 @@
 {
   "name": "side-memojang",
   "productName": "사이드메모장",
-  "version": "1.0.7",
+  "version": "1.1.2",
   "description": "화면 가장자리에 붙는 Seokryu의 개인용 플로팅 메모장",
   "main": "src/main/main.js",
   "author": {
