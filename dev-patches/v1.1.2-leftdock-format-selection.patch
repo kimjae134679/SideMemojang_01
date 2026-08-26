@@ -1,0 +1,116 @@
+--- /tmp/orig_sidememo/src/renderer/panel.js	2026-08-02 07:09:37.000000000 +0000
++++ /mnt/data/sidememojang_fix/src/src/renderer/panel.js	2026-08-26 15:17:38.913435369 +0000
+@@ -1480,13 +1480,40 @@
+   textColorInlinePalette.dataset.bound = '1';
+ }
+ 
++function editorContentRange() {
++  const range = document.createRange();
++  range.selectNodeContents(memoEditor);
++  return range;
++}
++
++function clampRangeToEditor(range) {
++  if (!range || !memoEditor) return null;
++  const bounds = editorContentRange();
++  try {
++    // Selection can start a few pixels outside contenteditable when the user drags
++    // all the way to the first/last character. Clamp that partial selection to the
++    // editor instead of treating it as an invalid outside selection.
++    if (range.compareBoundaryPoints(Range.END_TO_START, bounds) <= 0) return null;
++    if (range.compareBoundaryPoints(Range.START_TO_END, bounds) >= 0) return null;
++
++    const fixed = range.cloneRange();
++    if (fixed.compareBoundaryPoints(Range.START_TO_START, bounds) < 0) {
++      fixed.setStart(bounds.startContainer, bounds.startOffset);
++    }
++    if (fixed.compareBoundaryPoints(Range.END_TO_END, bounds) > 0) {
++      fixed.setEnd(bounds.endContainer, bounds.endOffset);
++    }
++    return fixed;
++  } catch (_) {
++    return memoEditor.contains(range.commonAncestorContainer) ? range.cloneRange() : null;
++  }
++}
++
+ function saveEditorSelection() {
+   const selection = window.getSelection();
+   if (!selection || selection.rangeCount === 0) return;
+-  const range = selection.getRangeAt(0);
+-  if (memoEditor.contains(range.commonAncestorContainer)) {
+-    savedEditorRange = range.cloneRange();
+-  }
++  const range = clampRangeToEditor(selection.getRangeAt(0));
++  if (range) savedEditorRange = range;
+ }
+ function restoreEditorSelection() {
+   if (!savedEditorRange) return;
+@@ -1572,9 +1599,22 @@
+ function getEditorSelection() {
+   const selection = window.getSelection();
+   if (!selection || selection.rangeCount === 0) return null;
+-  const range = selection.getRangeAt(0);
+-  if (!memoEditor.contains(range.commonAncestorContainer)) return null;
+-  return { selection, range };
++  const range = clampRangeToEditor(selection.getRangeAt(0));
++  if (!range) return null;
++
++  // Keep the live browser selection inside the editor as well. This makes
++  // Ctrl+B/I/U/S reliable when a drag selection began just outside the first
++  // character or ended just outside the final character.
++  const live = selection.getRangeAt(0);
++  const differs = live.startContainer !== range.startContainer ||
++    live.startOffset !== range.startOffset ||
++    live.endContainer !== range.endContainer ||
++    live.endOffset !== range.endOffset;
++  if (differs) {
++    selection.removeAllRanges();
++    selection.addRange(range.cloneRange());
++  }
++  return { selection, range: selection.getRangeAt(0) };
+ }
+ 
+ function hasNonEmptyEditorSelection() {
+@@ -1920,6 +1960,16 @@
+   }, { passive: false });
+ 
+   toggleAppearanceButton.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); const next = !appearanceOpen; closeTextColorPanel(); appearanceOpen = next; render(); });
++
++  // Toolbar clicks must not collapse the contenteditable selection. Preserve it
++  // on mousedown for every formatting control, not only the color/font-size UI.
++  [boldButton, italicButton, underlineButton, strikeButton, alignLeftButton, alignCenterButton, alignRightButton, listButton, checklistButton].forEach((button) => {
++    button?.addEventListener('mousedown', (event) => {
++      event.preventDefault();
++      saveEditorSelection();
++    });
++  });
++
+   boldButton.addEventListener('click', () => toggleBoldExplicit());
+   italicButton.addEventListener('click', () => runFormat('italic'));
+   underlineButton.addEventListener('click', () => runFormat('underline'));
+--- /tmp/orig_sidememo/src/renderer/style.css	2026-08-02 07:09:38.000000000 +0000
++++ /mnt/data/sidememojang_fix/src/src/renderer/style.css	2026-08-26 15:17:38.913930558 +0000
+@@ -3490,3 +3490,23 @@
+   line-height: 0 !important;
+ }
+ .image-wrap + .image-wrap { margin-top: 1px !important; }
++
++
++/* v1.1.2 dock-edge + editor selection QA fix */
++/* The docked outer edge must touch the monitor work-area exactly. Remove the
++   last transparent/border pixel on the screen-facing side without changing the
++   rounded inner edge. */
++.panel[data-position='left'].expanded .panel-content {
++  margin-left: 0 !important;
++  border-left: 0 !important;
++  transform: none !important;
++}
++.panel[data-position='right'].expanded .panel-content {
++  margin-right: 0 !important;
++  border-right: 0 !important;
++  transform: none !important;
++}
++html, body, #app, .panel {
++  padding: 0 !important;
++  margin: 0 !important;
++}
