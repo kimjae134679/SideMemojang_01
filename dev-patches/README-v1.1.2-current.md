@@ -18,7 +18,8 @@
 
 현재 로컬 소스 산출물:
 - `SideMemojang_01-v1.1.2-setup-shortcut-fixed-source.zip`
-- SHA-256: `268ae0259df8d1f0098729abbd2500a3eac6f761d15ffd9aa1a688d789cea6c0`
+- SHA-256: `9e381051c56ee76743d533f853f5c67507e4033fae023c85a8e0bdd7f68b92a2`
+- GitHub Actions 릴리스 워크플로와 테스트 Setup 빌더 소스 포함
 
 현재 테스트용 Setup:
 - `side-memojang-setup-1.1.2.exe`
