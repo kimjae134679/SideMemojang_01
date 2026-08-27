@@ -1,0 +1,13 @@
+name: Runner Probe
+
+on:
+  push:
+    branches:
+      - release/**
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        run: echo "runner-ok"
