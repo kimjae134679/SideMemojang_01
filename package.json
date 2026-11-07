@@ -44,7 +44,7 @@
         "nsis"
       ],
       "icon": "assets/icon.ico",
-      "publisherName": "Seokryu"
+      "verifyUpdateCodeSignature": false
     },
     "nsis": {
       "oneClick": false,
