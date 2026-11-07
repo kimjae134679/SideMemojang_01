@@ -31,9 +31,11 @@ if (fs.existsSync(exeFile) && fs.existsSync(ymlFile)) {
   assert(topField('version') === version, 'latest.yml version mismatch');
   assert(topField('path') === exeName, 'latest.yml path mismatch');
   assert(yml.includes('url: ' + exeName), 'latest.yml URL mismatch');
-  assert(yml.includes('size: ' + fileSize), 'latest.yml file size mismatch');
+  const manifestSize = yml.match(/^[ \t]+size:\s*(\d+)\s*$/m)?.[1];
+  assert(Number(manifestSize) === fileSize, 'latest.yml files[].size mismatch');
   assert(topField('sha512') === sha512, 'latest.yml top-level SHA-512 mismatch');
-  assert(yml.includes('sha512: ' + sha512), 'latest.yml nested SHA-512 mismatch');
+  const nestedSha512 = yml.match(/^[ \t]+sha512:\s*(\S+)\s*$/m)?.[1];
+  assert(nestedSha512 === sha512, 'latest.yml files[].sha512 mismatch');
 }
 if (errors.length) {
   console.error('Release verification failed:\n' + errors.map(s => ' - ' + s).join('\n'));
