@@ -15,7 +15,8 @@
     "dist": "electron-builder --win nsis --publish never",
     "dist:portable": "electron-builder --win portable",
     "pack": "electron-builder --dir",
-    "dist:setup": "electron-builder --win nsis --publish never"
+    "dist:setup": "electron-builder --win nsis --publish never",
+    "verify:release": "node tools/verify-release.mjs"
   },
   "devDependencies": {
     "electron": "^31.7.7",
